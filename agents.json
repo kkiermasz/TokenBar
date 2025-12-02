@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "name": "TokenBar repository instructions",
+  "scope": "project",
+  "source": "Migrated from AGENTS.md",
+  "instructions": [
+    {
+      "title": "Project Structure & Module Organization",
+      "points": [
+        "Target a macOS menu bar app that tracks local Codex and Claude agent usage (tokens, sessions, and cost estimates).",
+        "Proposed layout: `Sources/App` for SwiftUI menu bar surfaces, `Sources/Telemetry` for metering and cost math, `Sources/Storage` for persistence (Keychain/CoreData/JSON), `Sources/UIComponents` for reusable views, `Resources/` for assets, and `Scripts/` for automation.",
+        "Keep public APIs small; prefer protocol-oriented seams (e.g., `UsageTracker`, `CostCalculator`, `SessionRepository`) to allow preview stubs and tests."
+      ]
+    },
+    {
+      "title": "Build, Test, and Development Commands",
+      "points": [
+        "Preferred toolchain: Xcode 15+ with Swift 5.9+.",
+        "Build app from CLI: `xcodebuild -scheme TokenBar -configuration Debug -destination 'platform=macOS' | xcbeautify` (run this before finishing any branch/PR when code changes; mandatory in PR checklist).",
+        "Run tests: `swift test` (or `xcodebuild test -scheme TokenBarTests | xcbeautify`) once the test target exists.",
+        "Lint/format: add SwiftFormat/SwiftLint via Mint or a Makefile target; run `make lint format` when available to keep CI green."
+      ]
+    },
+    {
+      "title": "Coding Style & Naming Conventions",
+      "points": [
+        "Swift style: 4-space indentation, 120-col soft wrap, trailing commas in multi-line collections, `final` where possible.",
+        "Naming: Views end with `View`, services with `Service`, repositories with `Repository`, DTOs with `Record`. Use domain language: `AgentSession`, `TokenBreakdown`, `CostSummary`.",
+        "Avoid singletons; inject dependencies through initializers. Prefer value types (`struct`) for models and SwiftUI views.",
+        "Keep menu bar logic thin—push calculations into dedicated modules so they can be tested headlessly.",
+        "Logging: use `Logger` from `OSLog`; avoid `NSLog` to keep output structured and privacy-aware."
+      ]
+    },
+    {
+      "title": "Testing Guidelines",
+      "points": [
+        "Use XCTest with file-named tests (e.g., `CostCalculatorTests`, `SessionRepositoryTests`); method names should read as expectations (`testCostTotalsRoundToCents()`).",
+        "Provide fixtures for token usage and pricing tables; ensure rounding rules are captured in tests.",
+        "Aim for coverage on all cost math and persistence boundaries; add UI snapshot/preview tests only for critical states (empty, live tracking, error).",
+        "Fast tests live in the main test target; integration tests that touch storage or networking should be isolated and skippable in CI when slow."
+      ]
+    },
+    {
+      "title": "Commit & Pull Request Guidelines",
+      "points": [
+        "Commits: imperative, short, scoped to one concern (`Add session ledger model`, `Wire cost summary to menu bar`). Include rationale in the body if behavior changes.",
+        "Pull requests: concise description of the change, testing performed, and screenshots/gifs for UI-affecting work (menu bar states). Link issues or task IDs when available.",
+        "Keep diffs minimal; prefer separate PRs for tooling vs. features. Include any new commands or config steps in this guide or a Makefile update."
+      ]
+    },
+    {
+      "title": "Security & Configuration Tips",
+      "points": [
+        "Never commit secrets or API keys; load provider keys/pricing via Keychain or environment variables (e.g., `.envrc`, user defaults override) and document required names.",
+        "Sanitize and aggregate telemetry locally; do not transmit usage data off-device without explicit user consent. Make export/import opt-in and auditable."
+      ]
+    }
+  ]
+}

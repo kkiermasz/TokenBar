@@ -6,12 +6,25 @@
 //
 
 import SwiftUI
+import AppKit
 
 @main
 struct TokenBarApp: App {
+    @StateObject private var usageStore = UsageStore()
+
+    init() {
+        // Keep app dockless; show only the menu bar extra.
+        NSApplication.shared.setActivationPolicy(.accessory)
+    }
+
     var body: some Scene {
-        WindowGroup {
-            ContentView()
+        MenuBarExtra("TokenBar", systemImage: "chart.bar.xaxis") {
+            MenuBarView()
+                .environmentObject(usageStore)
+        }
+
+        Settings {
+            SettingsView()
         }
     }
 }
