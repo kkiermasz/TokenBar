@@ -11,12 +11,12 @@ on:
 env:
   SCHEME: TokenBar
   CONFIGURATION: Release
-  ARCHIVE_PATH: ${{ runner.temp }}/TokenBar.xcarchive
-  EXPORT_PATH: ${{ runner.temp }}/artifacts
 
 jobs:
   archive:
     runs-on: macos-14
+    env:
+      ARTIFACT_NAME: TokenBar-${{ github.ref_name }}-macOS
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -24,10 +24,16 @@ jobs:
       - name: Show Xcode version
         run: xcodebuild -version
 
+      - name: Prepare build paths
+        run: |
+          echo "ARCHIVE_PATH=$RUNNER_TEMP/TokenBar.xcarchive" >> "$GITHUB_ENV"
+          echo "EXPORT_PATH=$RUNNER_TEMP/artifacts" >> "$GITHUB_ENV"
+
       - name: Archive app (unsigned)
         run: |
           set -eo pipefail
           xcodebuild \
+            -project TokenBar.xcodeproj \
             -scheme "$SCHEME" \
             -configuration "$CONFIGURATION" \
             -destination 'platform=macOS' \
@@ -51,6 +57,6 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: TokenBar-${{ github.ref_name }}-macOS
+          name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ZIP_PATH }}
           if-no-files-found: error
