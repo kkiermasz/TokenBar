@@ -1,0 +1,56 @@
+name: Archive macOS App
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "*"
+  workflow_dispatch:
+
+env:
+  SCHEME: TokenBar
+  CONFIGURATION: Release
+  ARCHIVE_PATH: ${{ runner.temp }}/TokenBar.xcarchive
+  EXPORT_PATH: ${{ runner.temp }}/artifacts
+
+jobs:
+  archive:
+    runs-on: macos-14
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Archive app (unsigned)
+        run: |
+          set -eo pipefail
+          xcodebuild \
+            -scheme "$SCHEME" \
+            -configuration "$CONFIGURATION" \
+            -destination 'platform=macOS' \
+            -archivePath "$ARCHIVE_PATH" \
+            clean archive \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package app
+        run: |
+          set -eo pipefail
+          mkdir -p "$EXPORT_PATH"
+          APP_PATH="$ARCHIVE_PATH/Products/Applications/${SCHEME}.app"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "App not found at $APP_PATH"
+            exit 1
+          fi
+          ZIP_PATH="$EXPORT_PATH/${SCHEME}-${GITHUB_REF_NAME}-macOS.zip"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" "$ZIP_PATH"
+          echo "ZIP_PATH=$ZIP_PATH" >> "$GITHUB_ENV"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TokenBar-${{ github.ref_name }}-macOS
+          path: ${{ env.ZIP_PATH }}
+          if-no-files-found: error
