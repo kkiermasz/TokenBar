@@ -99,8 +99,6 @@ TokenBar/
 
 ## Development Workflow
 
-**Important:** This project includes a `ccusage` submodule for reference documentation. The main TokenBar Swift code does not depend on it at runtime.
-
 **Code Style:**
 
 - 4-space indentation (standard Swift convention)
@@ -179,4 +177,3 @@ TokenBar/
 
 - `/docs/ccusage-analysis.md` - Analysis of ccusage implementation (reference for token accounting)
 - `/agents.json` - Codex-specific repository instructions
-- `/ccusage/` - Submodule containing ccusage CLI tool (for reference only)
