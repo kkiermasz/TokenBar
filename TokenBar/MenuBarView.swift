@@ -2,104 +2,102 @@ import SwiftUI
 import AppKit
 
 struct MenuBarView: View {
+    @EnvironmentObject private var environment: AppEnvironment
     @EnvironmentObject private var usageStore: UsageStore
+    @Environment(\.openSettings) private var openSettings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("TokenBar")
-                        .font(.headline)
-                    if let snapshot = usageStore.snapshot {
-                        Text("\(snapshot.totalTokens.formatted(.number)) tokens · \(currencyString(from: snapshot.totalCostUSD))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Waiting for first session")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                }
-                Spacer()
-                Button(action: usageStore.refresh) {
-                    Image(systemName: "arrow.clockwise")
-                }
-                .buttonStyle(.borderless)
-                .help("Refresh usage")
-            }
+        VStack(alignment: .leading, spacing: 14) {
+            UsageHeaderView(
+                snapshot: usageStore.snapshot,
+                isLoading: usageStore.isLoading,
+                errorMessage: usageStore.errorMessage
+            )
+
+            Divider()
 
             if let snapshot = usageStore.snapshot {
-                ForEach(snapshot.summaries) { summary in
-                    HStack {
-                        Image(systemName: summary.agent.symbolName)
-                            .foregroundStyle(summary.agent.accentColor)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(summary.agent.displayName)
-                            Text("\(summary.sessions) sessions · \(summary.totalTokens.formatted(.number)) tokens")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                        }
-                        Spacer()
-                        Text(summary.estimatedCostUSD, format: .currency(code: "USD"))
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+                VStack(alignment: .leading, spacing: 12) {
+                    ForEach(snapshot.periods) { period in
+                        PeriodUsageRow(usage: period)
                     }
+                    if !snapshot.modelBreakdownToday.isEmpty {
+                        Divider()
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Today by model")
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.primary)
+                            ForEach(snapshot.modelBreakdownToday.prefix(5)) { model in
+                                ModelUsageRow(usage: model)
+                            }
+                            if snapshot.modelBreakdownToday.count > 5 {
+                                Text("Showing top 5 of \(snapshot.modelBreakdownToday.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    Text(weekStartDescription)
+                        .font(.caption2)
+                        .foregroundColor(.secondary)
                 }
-
-                Divider()
-                Text("Updated \(snapshot.updatedAt.formatted(date: .omitted, time: .shortened))")
-                    .font(.caption2)
-                    .foregroundStyle(.secondary)
-            } else {
-                Text("Start a Codex or Claude session to see live totals.")
+            } else if usageStore.isLoading {
+                Label("Loading Claude usage…", systemImage: "sparkles")
                     .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.primary)
+            } else {
+                Label("Start a Claude session to see usage here.", systemImage: "ellipsis.rectangle")
+                    .font(.caption)
+                    .foregroundColor(.primary)
             }
 
             Divider()
-            VStack(alignment: .leading, spacing: 8) {
+
+            HStack(spacing: 12) {
+                Label("Auto-refreshing every minute", systemImage: "arrow.clockwise.circle")
+                    .font(.caption)
+                    .foregroundColor(.primary)
+                Spacer()
                 if #available(macOS 14.0, *) {
-                    SettingsLink {
-                        Label("Open Settings…", systemImage: "gearshape")
+                    Button {
+                        NSApp.activate(ignoringOtherApps: true)
+                        openSettings()
+                    } label: {
+                        Label("Settings", systemImage: "gearshape")
                             .font(.caption)
                     }
                     .buttonStyle(.plain)
                 } else {
-                    Label("Open Settings…", systemImage: "gearshape")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .help("Requires macOS 14+ to open Settings from the menu bar")
+                    SettingsLink {
+                        Label("Settings", systemImage: "gearshape")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
                 }
-            }
 
-            Divider()
-            Button(role: .destructive) {
-                NSApplication.shared.terminate(nil)
-            } label: {
-                Label("Quit TokenBar", systemImage: "power")
-                    .font(.caption)
+                Button(role: .destructive) {
+                    NSApplication.shared.terminate(nil)
+                } label: {
+                    Label("Quit TokenBar", systemImage: "power")
+                        .font(.caption)
+                }
+                .buttonStyle(.plain)
             }
-            .buttonStyle(.plain)
         }
         .padding(12)
-        .frame(width: 280)
-        .onAppear {
+        .frame(width: 320)
+        .task {
             usageStore.refresh()
+            usageStore.startAutoRefresh()
+        }
+        .onDisappear {
+            usageStore.stopAutoRefresh()
         }
     }
 
-    private func currencyString(from decimal: Decimal) -> String {
-        let number = NSDecimalNumber(decimal: decimal)
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .currency
-        formatter.currencyCode = "USD"
-        formatter.minimumFractionDigits = 2
-        formatter.maximumFractionDigits = 4
-        return formatter.string(from: number) ?? "$0.00"
+    private var weekStartDescription: String {
+        let index = environment.calendar.firstWeekday - 1
+        let symbol = environment.calendar.weekdaySymbols.indices.contains(index) ? environment.calendar.weekdaySymbols[index] : "Sunday"
+        return "Weeks start on \(symbol)"
     }
-}
-
-#Preview {
-    MenuBarView()
-        .environmentObject(UsageStore())
 }
