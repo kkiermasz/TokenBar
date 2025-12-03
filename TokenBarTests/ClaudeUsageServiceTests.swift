@@ -1,8 +1,9 @@
-import XCTest
+import Testing
 @testable import TokenBar
 
-final class ClaudeUsageServiceTests: XCTestCase {
-    func testParsesClaudeLineWithoutFractionalSecondsAndCalculatesCost() async throws {
+struct ClaudeUsageServiceTests {
+    @Test
+    func parsesClaudeLineWithoutFractionalSecondsAndCalculatesCost() async throws {
         let tmp = try temporaryClaudeDir()
         let projects = tmp.appendingPathComponent("projects", isDirectory: true)
         try FileManager.default.createDirectory(at: projects, withIntermediateDirectories: true)
@@ -27,13 +28,13 @@ final class ClaudeUsageServiceTests: XCTestCase {
         let snapshot = try await service.fetchUsage(now: Date(timeIntervalSince1970: 1_704_192_000), calendar: .autoupdatingCurrent)
         let today = snapshot.periods.first(where: { $0.period == .today })?.metrics
 
-        XCTAssertEqual(today?.inputTokens, 1000)
-        XCTAssertEqual(today?.outputTokens, 500)
-        XCTAssertEqual(today?.cacheTokens, 150)
-        XCTAssertEqual(today?.costUSD, pricing.cost)
+        #expect(today?.inputTokens == 1000)
+        #expect(today?.outputTokens == 500)
+        #expect(today?.cacheTokens == 150)
+        #expect(today?.costUSD == pricing.cost)
 
-        XCTAssertEqual(snapshot.modelBreakdownToday.first?.modelName, "claude-sonnet-4-20250514")
-        XCTAssertEqual(snapshot.modelBreakdownToday.first?.totalTokens, 1650)
+        #expect(snapshot.modelBreakdownToday.first?.modelName == "claude-sonnet-4-20250514")
+        #expect(snapshot.modelBreakdownToday.first?.totalTokens == 1650)
     }
 }
 
