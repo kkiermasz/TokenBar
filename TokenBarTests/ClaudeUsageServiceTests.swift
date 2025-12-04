@@ -1,8 +1,11 @@
-import XCTest
+import Testing
+import Foundation
 @testable import TokenBar
 
-final class ClaudeUsageServiceTests: XCTestCase {
-    func testParsesClaudeLineWithoutFractionalSecondsAndCalculatesCost() async throws {
+@Suite("Claude Usage Service Tests")
+struct ClaudeUsageServiceTests {
+    @Test("Parses Claude line without fractional seconds and calculates cost")
+    func parsesClaudeLineWithoutFractionalSecondsAndCalculatesCost() async throws {
         let tmp = try temporaryClaudeDir()
         let projects = tmp.appendingPathComponent("projects", isDirectory: true)
         try FileManager.default.createDirectory(at: projects, withIntermediateDirectories: true)
@@ -27,33 +30,33 @@ final class ClaudeUsageServiceTests: XCTestCase {
         let snapshot = try await service.fetchUsage(now: Date(timeIntervalSince1970: 1_704_192_000), calendar: .autoupdatingCurrent)
         let today = snapshot.periods.first(where: { $0.period == .today })?.metrics
 
-        XCTAssertEqual(today?.inputTokens, 1000)
-        XCTAssertEqual(today?.outputTokens, 500)
-        XCTAssertEqual(today?.cacheTokens, 150)
-        XCTAssertEqual(today?.costUSD, pricing.cost)
+        #expect(today?.inputTokens == 1000)
+        #expect(today?.outputTokens == 500)
+        #expect(today?.cacheTokens == 150)
+        #expect(today?.costUSD == pricing.cost)
 
-        XCTAssertEqual(snapshot.modelBreakdownToday.first?.modelName, "claude-sonnet-4-20250514")
-        XCTAssertEqual(snapshot.modelBreakdownToday.first?.totalTokens, 1650)
+        #expect(snapshot.modelBreakdownToday.first?.modelName == "claude-sonnet-4-20250514")
+        #expect(snapshot.modelBreakdownToday.first?.totalTokens == 1650)
     }
 }
 
-private extension ClaudeUsageServiceTests {
-    struct StubPricing: ClaudePricingProviding {
-        let cost: Decimal
+// MARK: - Test Helpers
 
-        func cost(for usage: TokenUsage, model: String?, overrideCostUSD: Double?) async -> Decimal {
-            if let overrideCostUSD {
-                return Decimal(overrideCostUSD)
-            }
-            return cost
+private struct StubPricing: ClaudePricingProviding {
+    let cost: Decimal
+
+    func cost(for usage: TokenUsage, model: String?, overrideCostUSD: Double?) async -> Decimal {
+        if let overrideCostUSD {
+            return Decimal(overrideCostUSD)
         }
+        return cost
     }
+}
 
-    func temporaryClaudeDir() throws -> URL {
-        let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
-        try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
-        return url
-    }
+private func temporaryClaudeDir() throws -> URL {
+    let url = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
+    try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+    return url
 }
 
 private extension String {
