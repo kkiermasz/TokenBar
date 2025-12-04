@@ -3,7 +3,7 @@
 > Track your Claude AI usage and costs right from your macOS menu bar
 
 <p align="center">
-  <img src="Screenshot 2025-12-03 at 14.07.34.png" alt="TokenBar Menu" width="400">
+  <img src="screenshot.png" alt="TokenBar Menu" width="400">
 </p>
 
 TokenBar is a lightweight macOS menu bar application that helps you monitor token usage and costs for Claude Code and Codex CLI. It reads telemetry data locally from your machine and displays real-time statistics without sending any data to external servers.
@@ -118,7 +118,7 @@ See [CLAUDE.md](CLAUDE.md) for detailed development guidelines.
 
 - Pricing data provided by [LiteLLM](https://github.com/BerriAI/litellm)
 - Built with SwiftUI for macOS 14+
-- Inspired by Claude Code's `ccusage` command
+- Inspired by Claude Code's `ccusage` command and [ccusage](https://github.com/ryoppippi/ccusage) by ryoppippi
 
 ## License
 
