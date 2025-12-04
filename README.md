@@ -85,45 +85,6 @@ TokenBar uses a protocol-oriented architecture with clear separation of concerns
 
 All processing happens locally. The only network request is fetching the LiteLLM pricing data (cached per session).
 
-## Development
-
-### Project Structure
-
-```
-TokenBar/
-├── TokenBarApp.swift           # App entry point
-├── Services/
-│   ├── ClaudeUsageService.swift
-│   ├── ClaudePricingService.swift
-│   └── AppEnvironment.swift
-├── Stores/
-│   └── UsageStore.swift
-├── Models/
-│   └── UsageModels.swift
-├── Views/
-│   ├── MenuBarView.swift
-│   └── ContentView.swift
-└── Utilities/
-    └── CurrencyFormatter.swift
-```
-
-### Running Tests
-
-```bash
-xcodebuild test -scheme TokenBarTests -destination 'platform=macOS'
-```
-
-### Architecture
-
-TokenBar follows protocol-oriented design principles:
-
-- **`ClaudeUsageServicing`** - Protocol for usage data fetching and aggregation
-- **`ClaudePricingProviding`** - Protocol for cost calculation
-- **Dependency Injection** - All services injected through initializers for testability
-- **SwiftUI + Combine** - Modern reactive UI with `@StateObject` and `ObservableObject`
-
-See [CLAUDE.md](CLAUDE.md) for detailed development guidelines.
-
 ## Privacy & Security
 
 - **No data collection** - TokenBar never sends your usage data anywhere
@@ -151,12 +112,7 @@ A: Currently, TokenBar is view-only. You can access raw telemetry files directly
 
 Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
-### Development Guidelines
-
-- Follow Swift conventions (4-space indentation)
-- Add tests for new functionality
-- Keep views thin - push logic into services
-- Update CLAUDE.md if adding new architecture patterns
+See [CLAUDE.md](CLAUDE.md) for detailed development guidelines.
 
 ## Acknowledgments
 
