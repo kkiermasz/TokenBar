@@ -18,6 +18,6 @@ struct MenuBarView: View {
         }
         .background(Color.clear)
         .padding(12)
-        .frame(width: 320)
+        .frame(width: 340)
     }
 }

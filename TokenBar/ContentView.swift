@@ -17,6 +17,6 @@ struct ContentView: View {
         }
         .background(Color.clear)
         .padding(20)
-        .frame(minWidth: 360)
+        .frame(minWidth: 380)
     }
 }

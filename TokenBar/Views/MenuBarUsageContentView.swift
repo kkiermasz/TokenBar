@@ -105,38 +105,45 @@ struct MenuBarUsageContentView: View {
 
             Divider()
 
-            HStack(spacing: 12) {
-                Label("Auto-refreshing every minute", systemImage: "arrow.clockwise.circle")
-                    .font(.caption)
-                    .foregroundColor(.primary)
-                    .lineLimit(nil)
-                    .multilineTextAlignment(.leading)
-                Spacer()
-                if #available(macOS 14.0, *) {
-                    Button {
-                        NSApp.activate(ignoringOtherApps: true)
-                        openSettings()
-                    } label: {
-                        Label("Settings", systemImage: "gearshape")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.plain)
-                } else {
-                    SettingsLink {
-                        Label("Settings", systemImage: "gearshape")
-                            .font(.caption)
-                    }
-                    .buttonStyle(.plain)
-                }
-
-                Button(role: .destructive) {
-                    NSApplication.shared.terminate(nil)
-                } label: {
-                    Label("Quit TokenBar", systemImage: "power")
+            HStack(alignment: .top, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Label("Auto-refreshing every minute", systemImage: "arrow.clockwise.circle")
                         .font(.caption)
+                        .foregroundColor(.primary)
+                        .lineLimit(nil)
+                        .multilineTextAlignment(.leading)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
-                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                HStack(spacing: 8) {
+                    if #available(macOS 14.0, *) {
+                        Button {
+                            NSApp.activate(ignoringOtherApps: true)
+                            openSettings()
+                        } label: {
+                            Label("Settings", systemImage: "gearshape")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                    } else {
+                        SettingsLink {
+                            Label("Settings", systemImage: "gearshape")
+                                .font(.caption)
+                        }
+                        .buttonStyle(.plain)
+                    }
+
+                    Button(role: .destructive) {
+                        NSApplication.shared.terminate(nil)
+                    } label: {
+                        Label("Quit", systemImage: "power")
+                            .font(.caption)
+                    }
+                    .buttonStyle(.plain)
+                }
             }
+            .padding(.bottom, 8)
         }
         .padding(.horizontal, 8)
         .task {
