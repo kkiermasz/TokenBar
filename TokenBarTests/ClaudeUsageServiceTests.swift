@@ -5,6 +5,7 @@ import Foundation
 @Suite("Claude Usage Service Tests")
 struct ClaudeUsageServiceTests {
     @Test("Parses Claude line without fractional seconds and calculates cost")
+    @MainActor
     func parsesClaudeLineWithoutFractionalSecondsAndCalculatesCost() async throws {
         let tmp = try temporaryClaudeDir()
         let projects = tmp.appendingPathComponent("projects", isDirectory: true)
@@ -40,6 +41,7 @@ struct ClaudeUsageServiceTests {
     }
 
     @Test("Aggregates weekly usage using locale week start")
+    @MainActor
     func aggregatesWeeklyUsageUsingLocaleWeekStart() async throws {
         let tmp = try temporaryClaudeDir()
         let projects = tmp.appendingPathComponent("projects", isDirectory: true)
