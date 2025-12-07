@@ -6,6 +6,7 @@ final class UsageStore: ObservableObject {
     @Published private(set) var snapshot: UsageSnapshot?
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+    @Published var selectedSource: UsageSource = .claude
 
     private let service: ClaudeUsageServicing
     private let calendar: Calendar
@@ -41,7 +42,7 @@ final class UsageStore: ObservableObject {
         isLoading = true
         errorMessage = nil
         do {
-            snapshot = try await service.fetchUsage(now: now, calendar: calendar)
+            snapshot = try await service.fetchUsage(now: now, calendar: calendar, source: selectedSource)
         } catch {
             snapshot = nil
             errorMessage = error.localizedDescription
@@ -58,7 +59,7 @@ extension UsageStore {
 }
 
 private struct PreviewUsageService: ClaudeUsageServicing {
-    func fetchUsage(now: Date, calendar: Calendar) async throws -> UsageSnapshot {
+    func fetchUsage(now: Date, calendar: Calendar, source: UsageSource) async throws -> UsageSnapshot {
         let today = UsageMetrics(inputTokens: 2_400, outputTokens: 1_200, cacheTokens: 300, costUSD: Decimal(string: "0.07") ?? .zero, sessionCount: 3)
         let week = UsageMetrics(inputTokens: 11_400, outputTokens: 5_600, cacheTokens: 1_400, costUSD: Decimal(string: "0.31") ?? .zero, sessionCount: 9)
         let month = UsageMetrics(inputTokens: 42_000, outputTokens: 21_800, cacheTokens: 4_800, costUSD: Decimal(string: "1.12") ?? .zero, sessionCount: 21)

@@ -1,42 +1,22 @@
 import SwiftUI
 
 struct ContentView: View {
-    @EnvironmentObject private var usageStore: UsageStore
+    @Environment(\.claudeUsageService) private var usageService: ClaudeUsageServicing
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            UsageHeaderView(
-                snapshot: usageStore.snapshot,
-                isLoading: usageStore.isLoading,
-                errorMessage: usageStore.errorMessage
-            )
-
-            Divider()
-
-            if let snapshot = usageStore.snapshot {
-                VStack(alignment: .leading, spacing: 12) {
-                    ForEach(snapshot.periods) { usage in
-                        PeriodUsageRow(usage: usage)
-                    }
+        TabView {
+            UsageContentView(source: .claude, service: usageService)
+                .tabItem {
+                    Label(UsageSource.claude.title, systemImage: UsageSource.claude.icon)
                 }
-            } else if usageStore.isLoading {
-                Label("Loading Claude usage…", systemImage: "clock.arrow.circlepath")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            } else {
-                Label("Start a Claude session to see usage.", systemImage: "ellipsis.rectangle")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+
+            UsageContentView(source: .codex, service: usageService)
+                .tabItem {
+                    Label(UsageSource.codex.title, systemImage: UsageSource.codex.icon)
+                }
         }
+        .background(Color.clear)
         .padding(20)
         .frame(minWidth: 360)
-        .task {
-            usageStore.refresh()
-            usageStore.startAutoRefresh()
-        }
-        .onDisappear {
-            usageStore.stopAutoRefresh()
-        }
     }
 }

@@ -2,7 +2,7 @@ import Foundation
 import OSLog
 
 protocol ClaudeUsageServicing {
-    func fetchUsage(now: Date, calendar: Calendar) async throws -> UsageSnapshot
+    func fetchUsage(now: Date, calendar: Calendar, source: UsageSource) async throws -> UsageSnapshot
 }
 
 struct ClaudeUsageService: ClaudeUsageServicing {
@@ -10,18 +10,6 @@ struct ClaudeUsageService: ClaudeUsageServicing {
     private let processInfo: ProcessInfo
     private let pricing: ClaudePricingProviding
     private let logger = Logger(subsystem: "app.tokenbar", category: "claude-usage")
-
-    private static let isoFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        return formatter
-    }()
-
-    private static let isoNoFractionFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime]
-        return formatter
-    }()
 
     init(
         fileManager: FileManager = .default,
@@ -33,10 +21,14 @@ struct ClaudeUsageService: ClaudeUsageServicing {
         self.pricing = pricing
     }
 
-    func fetchUsage(now: Date = Date(), calendar: Calendar = .autoupdatingCurrent) async throws -> UsageSnapshot {
-        // For the status bar we only surface Claude Code usage; Codex data is intentionally excluded
-        // to avoid mixing sources and inflating totals.
-        let discoveredFiles = claudeRoots().flatMap { discoverJSONLFiles(in: $0, source: .claude) }
+    func fetchUsage(now: Date = Date(), calendar: Calendar = .autoupdatingCurrent, source: UsageSource = .claude) async throws -> UsageSnapshot {
+        let discoveredFiles: [DiscoveredFile]
+        switch source {
+        case .claude:
+            discoveredFiles = claudeRoots().flatMap { discoverJSONLFiles(in: $0, source: .claude) }
+        case .codex:
+            discoveredFiles = codexSessionRoots().flatMap { discoverJSONLFiles(in: $0, source: .codex) }
+        }
 
         if discoveredFiles.isEmpty {
             return UsageSnapshot(periods: UsagePeriod.allCases.map { period in
@@ -205,9 +197,21 @@ private extension ClaudeUsageService {
         decoder.dateDecodingStrategy = .custom { decoder in
             let container = try decoder.singleValueContainer()
             let raw = try container.decode(String.self)
-            if let date = ClaudeUsageService.isoFormatter.date(from: raw) ?? ClaudeUsageService.isoNoFractionFormatter.date(from: raw) {
+
+            let isoFormatter = ISO8601DateFormatter()
+            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+            if let date = isoFormatter.date(from: raw) {
                 return date
             }
+
+            let isoNoFractionFormatter = ISO8601DateFormatter()
+            isoNoFractionFormatter.formatOptions = [.withInternetDateTime]
+
+            if let date = isoNoFractionFormatter.date(from: raw) {
+                return date
+            }
+
             throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Invalid ISO8601 timestamp"))
         }
         decoder.keyDecodingStrategy = .convertFromSnakeCase
@@ -329,8 +333,14 @@ private extension ClaudeUsageService {
                 continue
             }
 
-            guard let timestampString = json["timestamp"] as? String,
-                  let timestamp = ClaudeUsageService.isoFormatter.date(from: timestampString) else {
+            guard let timestampString = json["timestamp"] as? String else {
+                continue
+            }
+
+            let isoFormatter = ISO8601DateFormatter()
+            isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+
+            guard let timestamp = isoFormatter.date(from: timestampString) else {
                 continue
             }
 

@@ -1,6 +1,31 @@
 import Foundation
 import SwiftUI
 
+enum UsageSource: String, CaseIterable, Identifiable {
+    case claude
+    case codex
+
+    var id: String { rawValue }
+
+    var title: String {
+        switch self {
+        case .claude:
+            return "Claude"
+        case .codex:
+            return "Codex"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .claude:
+            return "sparkles"
+        case .codex:
+            return "terminal"
+        }
+    }
+}
+
 enum UsagePeriod: String, CaseIterable, Identifiable {
     case today
     case week
