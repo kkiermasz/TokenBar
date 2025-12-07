@@ -95,7 +95,7 @@ TokenBar/
 - Uses `FileHandle.AsyncBytes` for streaming JSONL parsing
 - Deduplicates entries by `message.id + requestId` hash
 - Aggregates by calendar periods (today/week/month) using `Calendar` API
-- Calendar configured with `firstWeekday = 1` (Sunday) to match ccusage behavior
+- Calendar respects user's locale preferences for week start day
 
 ## Development Workflow
 

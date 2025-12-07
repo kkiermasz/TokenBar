@@ -468,7 +468,7 @@ private extension ClaudeUsageService {
         var calendar = Calendar(identifier: base.identifier)
         calendar.timeZone = base.timeZone
         calendar.locale = base.locale
-        calendar.firstWeekday = 1 // Sunday to mirror ccusage defaults
+        calendar.firstWeekday = base.firstWeekday
         return calendar
     }
 }

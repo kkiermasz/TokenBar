@@ -10,10 +10,7 @@ final class AppEnvironment: ObservableObject {
         usageService: ClaudeUsageServicing = ClaudeUsageService(),
         calendar: Calendar = .autoupdatingCurrent
     ) {
-        var workingCalendar = calendar
-        workingCalendar.firstWeekday = 1 // Sunday, mirrors ccusage defaults
-
         self.usageService = usageService
-        self.calendar = workingCalendar
+        self.calendar = calendar
     }
 }
