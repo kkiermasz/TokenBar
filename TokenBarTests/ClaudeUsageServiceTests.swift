@@ -25,7 +25,7 @@ struct ClaudeUsageServiceTests {
         setenv("CLAUDE_CONFIG_DIR", tmp.path, 1)
         defer { unsetenv("CLAUDE_CONFIG_DIR") }
 
-        let pricing = StubPricing(cost: Decimal(string: "0.0123")!)
+        let pricing = StubPricing(cost: Decimal(string: "0.0123") ?? .zero)
         let service = ClaudeUsageService(fileManager: .default, processInfo: .processInfo, pricing: pricing)
 
         let snapshot = try await service.fetchUsage(now: Date(timeIntervalSince1970: 1_704_192_000), calendar: .autoupdatingCurrent)
@@ -62,11 +62,11 @@ struct ClaudeUsageServiceTests {
         setenv("CLAUDE_CONFIG_DIR", tmp.path, 1)
         defer { unsetenv("CLAUDE_CONFIG_DIR") }
 
-        let pricing = StubPricing(cost: Decimal(string: "0.01")!)
+        let pricing = StubPricing(cost: Decimal(string: "0.01") ?? .zero)
         let service = ClaudeUsageService(fileManager: .default, processInfo: .processInfo, pricing: pricing)
 
         var calendar = Calendar(identifier: .gregorian)
-        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        calendar.timeZone = TimeZone(secondsFromGMT: 0) ?? .gmt
         calendar.locale = Locale(identifier: "pl_PL")
         calendar.firstWeekday = 2 // Monday
         calendar.minimumDaysInFirstWeek = 4
@@ -105,9 +105,15 @@ private func temporaryClaudeDir() throws -> URL {
     return url
 }
 
+private enum TestHelperError: Error {
+    case stringEncodingFailed
+}
+
 private extension String {
     func appendLine(to url: URL) throws {
-        let data = (self + "\n").data(using: .utf8)!
+        guard let data = (self + "\n").data(using: .utf8) else {
+            throw TestHelperError.stringEncodingFailed
+        }
         if FileManager.default.fileExists(atPath: url.path) {
             let handle = try FileHandle(forWritingTo: url)
             try handle.seekToEnd()

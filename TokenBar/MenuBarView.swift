@@ -2,7 +2,7 @@ import SwiftUI
 import AppKit
 
 struct MenuBarView: View {
-    @EnvironmentObject private var environment: AppEnvironment
+    @Environment(\.calendar) private var calendar
     @EnvironmentObject private var usageStore: UsageStore
     @Environment(\.openSettings) private var openSettings
 
@@ -96,8 +96,8 @@ struct MenuBarView: View {
     }
 
     private var weekStartDescription: String {
-        let index = environment.calendar.firstWeekday - 1
-        let symbol = environment.calendar.weekdaySymbols.indices.contains(index) ? environment.calendar.weekdaySymbols[index] : "Sunday"
+        let index = calendar.firstWeekday - 1
+        let symbol = calendar.weekdaySymbols.indices.contains(index) ? calendar.weekdaySymbols[index] : "Sunday"
         return "Weeks start on \(symbol)"
     }
 }

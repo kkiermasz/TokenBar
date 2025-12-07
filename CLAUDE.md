@@ -58,7 +58,7 @@ TokenBar follows a protocol-oriented architecture with clear separation of conce
 TokenBar/
 ├── TokenBarApp.swift           # App entry point (MenuBarExtra)
 ├── Services/
-│   ├── AppEnvironment.swift    # Dependency injection container
+│   ├── EnvironmentValues+Extensions.swift # SwiftUI environment keys for services
 │   ├── ClaudeUsageService.swift # JSONL parsing and aggregation
 │   ├── ClaudePricingService.swift # LiteLLM pricing integration
 │   └── LaunchAtLoginManager.swift
@@ -106,6 +106,7 @@ TokenBar/
 - Trailing commas in multi-line collections
 - Mark classes `final` where appropriate
 - Use `Logger` from `OSLog` for logging (never `NSLog`)
+- Never use `NSError` - create custom error enums conforming to `Error` protocol instead
 
 **Naming Conventions:**
 
@@ -122,6 +123,7 @@ TokenBar/
 - Prefer value types (`struct`) for models and SwiftUI views
 - Keep view logic thin - push calculations into services
 - All business logic should be testable without UI
+- **Dependency Injection:** Inject each service independently into SwiftUI environment rather than bundling them in a container class. Use custom `EnvironmentKey` extensions for each service (see `EnvironmentValues+Extensions.swift`). This provides cleaner, more granular dependency injection and makes it clear which views depend on which services.
 
 ## Testing Guidelines
 

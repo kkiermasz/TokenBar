@@ -44,13 +44,18 @@ final class ClaudePricingService: ClaudePricingProviding {
         "claude-",
         "openrouter/openai/",
     ]
-    private let pricingURL = URL(string: "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json")!
+    private let pricingURL: URL
 
     private var cachedPricing: [String: ModelPricing]?
     private var fetchTask: Task<[String: ModelPricing], Error>?
 
     init(session: URLSession = .shared) {
         self.session = session
+        // This URL is a constant and should always be valid
+        guard let url = URL(string: "https://raw.githubusercontent.com/BerriAI/litellm/main/model_prices_and_context_window.json") else {
+            preconditionFailure("Invalid hardcoded pricing URL")
+        }
+        self.pricingURL = url
     }
 
     func cost(for usage: TokenUsage, model: String?, overrideCostUSD: Double?) async -> Decimal {

@@ -6,34 +6,43 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		4CFA1C1B2F0A000100000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = E96D6B052EDF91120004E900 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E96D6B0C2EDF91120004E900;
+			remoteInfo = TokenBar;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
-		4CFA1C142F0A000100000001 /* ClaudeUsageServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeUsageServiceTests.swift; sourceTree = "<group>"; };
 		4CFA1C152F0A000100000001 /* TokenBarTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TokenBarTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E96D6B0D2EDF91120004E900 /* TokenBar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TokenBar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E96D6B0F2EDF91120004E900 /* TokenBar */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = TokenBar;
-			sourceTree = "<group>";
-		};
 		4CFA1C132F0A000100000001 /* TokenBarTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TokenBarTests;
 			sourceTree = "<group>";
 		};
+		E96D6B0F2EDF91120004E900 /* TokenBar */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TokenBar;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		E96D6B0A2EDF91120004E900 /* Frameworks */ = {
+		4CFA1C122F0A000100000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CFA1C122F0A000100000001 /* Frameworks */ = {
+		E96D6B0A2EDF91120004E900 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -64,6 +73,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		4CFA1C102F0A000100000001 /* TokenBarTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4CFA1C182F0A000100000001 /* Build configuration list for PBXNativeTarget "TokenBarTests" */;
+			buildPhases = (
+				4CFA1C112F0A000100000001 /* Sources */,
+				4CFA1C122F0A000100000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4CFA1C1C2F0A000100000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4CFA1C132F0A000100000001 /* TokenBarTests */,
+			);
+			name = TokenBarTests;
+			productName = TokenBarTests;
+			productReference = 4CFA1C152F0A000100000001 /* TokenBarTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		E96D6B0C2EDF91120004E900 /* TokenBar */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = E96D6B182EDF91130004E900 /* Build configuration list for PBXNativeTarget "TokenBar" */;
@@ -86,26 +115,6 @@
 			productReference = E96D6B0D2EDF91120004E900 /* TokenBar.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4CFA1C102F0A000100000001 /* TokenBarTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 4CFA1C182F0A000100000001 /* Build configuration list for PBXNativeTarget "TokenBarTests" */;
-			buildPhases = (
-				4CFA1C112F0A000100000001 /* Sources */,
-				4CFA1C122F0A000100000001 /* Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				4CFA1C1C2F0A000100000001 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4CFA1C132F0A000100000001 /* TokenBarTests */,
-			);
-			name = TokenBarTests;
-			productName = TokenBarTests;
-			productReference = 4CFA1C152F0A000100000001 /* TokenBarTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -116,12 +125,12 @@
 				LastSwiftUpdateCheck = 2600;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
-					E96D6B0C2EDF91120004E900 = {
-						CreatedOnToolsVersion = 26.0.1;
-					};
 					4CFA1C102F0A000100000001 = {
 						CreatedOnToolsVersion = 26.0.1;
 						TestTargetID = E96D6B0C2EDF91120004E900;
+					};
+					E96D6B0C2EDF91120004E900 = {
+						CreatedOnToolsVersion = 26.0.1;
 					};
 				};
 			};
@@ -156,14 +165,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		E96D6B092EDF91120004E900 /* Sources */ = {
+		4CFA1C112F0A000100000001 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		4CFA1C112F0A000100000001 /* Sources */ = {
+		E96D6B092EDF91120004E900 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -180,17 +189,56 @@
 		};
 /* End PBXTargetDependency section */
 
-/* Begin PBXContainerItemProxy section */
-		4CFA1C1B2F0A000100000001 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = E96D6B052EDF91120004E900 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = E96D6B0C2EDF91120004E900;
-			remoteInfo = TokenBar;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin XCBuildConfiguration section */
+		4CFA1C192F0A000100000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6ZGW2Q427X;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.tokenbar.TokenBarTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenBar.app/Contents/MacOS/TokenBar";
+			};
+			name = Debug;
+		};
+		4CFA1C1A2F0A000100000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6ZGW2Q427X;
+				ENABLE_TESTABILITY = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = app.tokenbar.TokenBarTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenBar.app/Contents/MacOS/TokenBar";
+			};
+			name = Release;
+		};
 		E96D6B162EDF91130004E900 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -377,52 +425,18 @@
 			};
 			name = Release;
 		};
-		4CFA1C192F0A000100000001 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6ZGW2Q427X;
-				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.tokenbar.TokenBarTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenBar.app/Contents/MacOS/TokenBar";
-			};
-			name = Debug;
-		};
-		4CFA1C1A2F0A000100000001 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 6ZGW2Q427X;
-				ENABLE_TESTABILITY = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks @loader_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = app.tokenbar.TokenBarTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = macosx;
-				SWIFT_STRICT_CONCURRENCY = complete;
-				SWIFT_VERSION = 6.0;
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TokenBar.app/Contents/MacOS/TokenBar";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		4CFA1C182F0A000100000001 /* Build configuration list for PBXNativeTarget "TokenBarTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4CFA1C192F0A000100000001 /* Debug */,
+				4CFA1C1A2F0A000100000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		E96D6B082EDF91120004E900 /* Build configuration list for PBXProject "TokenBar" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -437,15 +451,6 @@
 			buildConfigurations = (
 				E96D6B192EDF91130004E900 /* Debug */,
 				E96D6B1A2EDF91130004E900 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		4CFA1C182F0A000100000001 /* Build configuration list for PBXNativeTarget "TokenBarTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				4CFA1C192F0A000100000001 /* Debug */,
-				4CFA1C1A2F0A000100000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
