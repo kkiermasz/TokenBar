@@ -53,9 +53,7 @@ final class UsageStore: ObservableObject {
 extension UsageStore {
     static func preview() -> UsageStore {
         let service = PreviewUsageService()
-        var calendar = Calendar.autoupdatingCurrent
-        calendar.firstWeekday = 1
-        return UsageStore(service: service, calendar: calendar)
+        return UsageStore(service: service, calendar: .autoupdatingCurrent)
     }
 }
 
