@@ -21,6 +21,8 @@ struct PeriodUsageRow: View {
                 Text("\(usage.metrics.sessionCount) sessions · \(usage.metrics.totalTokens.formatted(.number)) tokens")
                     .font(.caption.weight(.medium))
                     .foregroundColor(.primary)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
 
             Spacer()
@@ -29,9 +31,11 @@ struct PeriodUsageRow: View {
                 Text(CurrencyFormatter.usd(from: usage.metrics.costUSD))
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.primary)
-                Text("in \(usage.metrics.inputTokens.formatted(.number)) / out \(usage.metrics.outputTokens.formatted(.number))")
+                Text("in\u{00A0}\(usage.metrics.inputTokens.formatted(.number)) / out\u{00A0}\(usage.metrics.outputTokens.formatted(.number))")
                     .font(.caption2)
                     .foregroundColor(.secondary)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(8)
