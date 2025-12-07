@@ -75,9 +75,28 @@ struct ModelUsage: Identifiable {
     }
 }
 
+struct SessionUsage: Identifiable {
+    let sessionId: String
+    let displayName: String
+    let inputTokens: Int
+    let outputTokens: Int
+    let cacheTokens: Int
+    let costUSD: Decimal
+    let firstSeen: Date
+    let lastSeen: Date
+    let requestCount: Int
+
+    var id: String { sessionId }
+
+    var totalTokens: Int {
+        inputTokens + outputTokens + cacheTokens
+    }
+}
+
 struct UsageSnapshot {
     let periods: [PeriodUsage]
     let modelBreakdownToday: [ModelUsage]
+    let sessionBreakdownToday: [SessionUsage]
     let updatedAt: Date
 
     var todayMetrics: UsageMetrics? {

@@ -8,11 +8,15 @@ struct MenuBarView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            UsageHeaderView(
-                snapshot: usageStore.snapshot,
-                isLoading: usageStore.isLoading,
-                errorMessage: usageStore.errorMessage
-            )
+            HStack(spacing: 8) {
+                Text("Claude usage")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                if usageStore.isLoading {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
 
             Divider()
 
@@ -27,11 +31,54 @@ struct MenuBarView: View {
                             Text("Today by model")
                                 .font(.caption.weight(.semibold))
                                 .foregroundColor(.primary)
+
+                            if let metrics = snapshot.todayMetrics {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    HStack(spacing: 8) {
+                                        Label("\(metrics.totalTokens.formatted(.number)) tokens", systemImage: "chart.bar.fill")
+                                        Label(CurrencyFormatter.usd(from: metrics.costUSD), systemImage: "creditcard.fill")
+                                    }
+                                    .font(.caption.weight(.semibold))
+                                    .foregroundColor(.primary)
+                                    .padding(8)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                            .fill(Color(nsColor: .controlBackgroundColor))
+                                            .shadow(color: .black.opacity(0.1), radius: 6, x: 0, y: 3)
+                                    )
+                                    Text("Updated \(snapshot.updatedAt.formatted(date: .omitted, time: .shortened))")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+
                             ForEach(snapshot.modelBreakdownToday.prefix(5)) { model in
                                 ModelUsageRow(usage: model)
                             }
                             if snapshot.modelBreakdownToday.count > 5 {
                                 Text("Showing top 5 of \(snapshot.modelBreakdownToday.count)")
+                                    .font(.caption2)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    if !snapshot.sessionBreakdownToday.isEmpty {
+                        Divider()
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Today by session")
+                                .font(.caption.weight(.semibold))
+                                .foregroundColor(.primary)
+                            ScrollView(.vertical, showsIndicators: true) {
+                                VStack(spacing: 6) {
+                                    ForEach(snapshot.sessionBreakdownToday) { session in
+                                        SessionUsageRow(usage: session)
+                                    }
+                                }
+                                .padding(.vertical, 1)
+                            }
+                            .frame(height: min(CGFloat(snapshot.sessionBreakdownToday.count) * 50, 200))
+                            if snapshot.sessionBreakdownToday.count > 1 {
+                                Text("\(snapshot.sessionBreakdownToday.count) sessions today")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }

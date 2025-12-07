@@ -1,19 +1,19 @@
 import SwiftUI
 
-struct ModelUsageRow: View {
-    let usage: ModelUsage
+struct SessionUsageRow: View {
+    let usage: SessionUsage
 
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             VStack(alignment: .leading, spacing: 2) {
-                Text(usage.modelName)
+                Text(usage.displayName)
                     .font(.subheadline.weight(.semibold))
                     .foregroundColor(.primary)
                     .lineLimit(1)
                     .truncationMode(.middle)
-                Text("\(usage.totalTokens.formatted(.number)) tokens · in \(usage.inputTokens.formatted(.number)), out \(usage.outputTokens.formatted(.number))")
+                Text("\(usage.totalTokens.formatted(.number)) tokens · \(usage.requestCount) requests")
                     .font(.caption2)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.secondary)
                     .lineLimit(nil)
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -24,13 +24,11 @@ struct ModelUsageRow: View {
                 Text(CurrencyFormatter.usd(from: usage.costUSD))
                     .font(.caption.weight(.semibold))
                     .foregroundColor(.primary)
-                if usage.cacheTokens > 0 {
-                    Text("cache \(usage.cacheTokens.formatted(.number))")
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
-                        .lineLimit(nil)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+                Text("in \(usage.inputTokens.formatted(.number)) / out \(usage.outputTokens.formatted(.number))")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .lineLimit(nil)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(8)

@@ -50,7 +50,7 @@ struct ClaudeUsageService: ClaudeUsageServicing {
                         sessionCount: 0
                     )
                 )
-            }, modelBreakdownToday: [], updatedAt: now)
+            }, modelBreakdownToday: [], sessionBreakdownToday: [], updatedAt: now)
         }
 
         var entries: [UsageEntry] = []
@@ -161,6 +161,8 @@ private extension ClaudeUsageService {
         let model: String?
         let usage: UsagePayload.Message.Usage
         let cost: Decimal
+        let cwd: String?
+        let gitBranch: String?
     }
 
     struct UsagePayload: Decodable {
@@ -182,6 +184,8 @@ private extension ClaudeUsageService {
         let requestId: String?
         let costUSD: Double?
         let message: Message
+        let cwd: String?
+        let gitBranch: String?
 
         var uniqueHash: String? {
             guard let messageId = message.id, let requestId else { return nil }
@@ -255,7 +259,9 @@ private extension ClaudeUsageService {
                     messageId: payload.message.id,
                     model: payload.message.model,
                     usage: usage,
-                    cost: cost
+                    cost: cost,
+                    cwd: payload.cwd,
+                    gitBranch: payload.gitBranch
                 )
             )
         }
@@ -371,7 +377,9 @@ private extension ClaudeUsageService {
                         cacheCreationInputTokens: 0,
                         cacheReadInputTokens: usage.cachedInputTokens
                     ),
-                    cost: .zero
+                    cost: .zero,
+                    cwd: nil,
+                    gitBranch: nil
                 )
             )
         }
@@ -398,10 +406,12 @@ private extension ClaudeUsageService {
         ]
 
         let models = summarizeModels(entries, within: startOfDay..<startOfTomorrow)
+        let sessions = summarizeSessions(entries, within: startOfDay..<startOfTomorrow)
 
         return UsageSnapshot(
             periods: periods,
             modelBreakdownToday: models,
+            sessionBreakdownToday: sessions,
             updatedAt: now
         )
     }
@@ -462,6 +472,87 @@ private extension ClaudeUsageService {
                 }
                 return lhs.costUSD > rhs.costUSD
             }
+    }
+
+    func summarizeSessions(_ entries: [UsageEntry], within window: Range<Date>) -> [SessionUsage] {
+        var sessionData: [String: (
+            cwd: String?,
+            branch: String?,
+            input: Int,
+            output: Int,
+            cache: Int,
+            cost: Decimal,
+            firstSeen: Date,
+            lastSeen: Date,
+            requestCount: Int
+        )] = [:]
+
+        for entry in entries where window.contains(entry.timestamp) {
+            guard let sessionId = entry.sessionId else { continue }
+
+            let cacheTokens = (entry.usage.cacheCreationInputTokens ?? 0) +
+                             (entry.usage.cacheReadInputTokens ?? 0)
+
+            if var data = sessionData[sessionId] {
+                data.input += entry.usage.inputTokens ?? 0
+                data.output += entry.usage.outputTokens ?? 0
+                data.cache += cacheTokens
+                data.cost += entry.cost
+                data.firstSeen = min(data.firstSeen, entry.timestamp)
+                data.lastSeen = max(data.lastSeen, entry.timestamp)
+                data.requestCount += 1
+                data.cwd = data.cwd ?? entry.cwd
+                data.branch = data.branch ?? entry.gitBranch
+                sessionData[sessionId] = data
+            } else {
+                sessionData[sessionId] = (
+                    cwd: entry.cwd,
+                    branch: entry.gitBranch,
+                    input: entry.usage.inputTokens ?? 0,
+                    output: entry.usage.outputTokens ?? 0,
+                    cache: cacheTokens,
+                    cost: entry.cost,
+                    firstSeen: entry.timestamp,
+                    lastSeen: entry.timestamp,
+                    requestCount: 1
+                )
+            }
+        }
+
+        return sessionData.map { sessionId, data in
+            let displayName = deriveSessionDisplayName(
+                cwd: data.cwd,
+                branch: data.branch,
+                sessionId: sessionId
+            )
+
+            return SessionUsage(
+                sessionId: sessionId,
+                displayName: displayName,
+                inputTokens: data.input,
+                outputTokens: data.output,
+                cacheTokens: data.cache,
+                costUSD: data.cost,
+                firstSeen: data.firstSeen,
+                lastSeen: data.lastSeen,
+                requestCount: data.requestCount
+            )
+        }.sorted { lhs, rhs in
+            lhs.lastSeen > rhs.lastSeen
+        }
+    }
+
+    func deriveSessionDisplayName(cwd: String?, branch: String?, sessionId: String) -> String {
+        if let cwd = cwd {
+            let projectName = URL(fileURLWithPath: cwd).lastPathComponent
+            if let branch = branch {
+                return "\(projectName) (\(branch))"
+            }
+            return projectName
+        }
+
+        let suffix = String(sessionId.suffix(8))
+        return "Session \(suffix)"
     }
 
     func configuredCalendar(from base: Calendar) -> Calendar {

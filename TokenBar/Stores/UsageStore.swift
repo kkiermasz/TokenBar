@@ -74,9 +74,46 @@ private struct PreviewUsageService: ClaudeUsageServicing {
             ModelUsage(modelName: "claude-opus-4-20250514", inputTokens: 800, outputTokens: 300, cacheTokens: 100, costUSD: Decimal(string: "0.03") ?? .zero),
         ]
 
+        let sessions = [
+            SessionUsage(
+                sessionId: "c0f2ff69-bac8-4eb9-a78c-0dd338bb4cf5",
+                displayName: "TokenBar (main)",
+                inputTokens: 1_200,
+                outputTokens: 600,
+                cacheTokens: 150,
+                costUSD: Decimal(string: "0.04") ?? .zero,
+                firstSeen: now.addingTimeInterval(-3600),
+                lastSeen: now.addingTimeInterval(-300),
+                requestCount: 15
+            ),
+            SessionUsage(
+                sessionId: "eb2ba5e6-7dd5-4321-b123-abc123456789",
+                displayName: "MyApp (feature-xyz)",
+                inputTokens: 800,
+                outputTokens: 400,
+                cacheTokens: 100,
+                costUSD: Decimal(string: "0.02") ?? .zero,
+                firstSeen: now.addingTimeInterval(-7200),
+                lastSeen: now.addingTimeInterval(-600),
+                requestCount: 8
+            ),
+            SessionUsage(
+                sessionId: "abc123de-4567-890a-bcde-f1234567890a",
+                displayName: "Session 456789ab",
+                inputTokens: 400,
+                outputTokens: 200,
+                cacheTokens: 50,
+                costUSD: Decimal(string: "0.01") ?? .zero,
+                firstSeen: now.addingTimeInterval(-9000),
+                lastSeen: now.addingTimeInterval(-8000),
+                requestCount: 3
+            ),
+        ]
+
         return UsageSnapshot(
             periods: periods,
             modelBreakdownToday: models,
+            sessionBreakdownToday: sessions,
             updatedAt: now
         )
     }
