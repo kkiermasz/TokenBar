@@ -24,29 +24,60 @@ jobs:
         with:
           xcode-version: latest-stable
 
+      - name: Import Code Signing Certificate
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          # Create variables
+          CERTIFICATE_PATH=$RUNNER_TEMP/build_certificate.p12
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 32)
+
+          # Import certificate from secrets
+          echo -n "$MACOS_CERTIFICATE" | base64 --decode -o $CERTIFICATE_PATH
+
+          # Create temporary keychain
+          security create-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+          security set-keychain-settings -lut 21600 $KEYCHAIN_PATH
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
+          # Import certificate to keychain
+          security import $CERTIFICATE_PATH -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 -k $KEYCHAIN_PATH
+          security list-keychain -d user -s $KEYCHAIN_PATH
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" $KEYCHAIN_PATH
+
       - name: Build and Archive
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
           xcodebuild clean archive \
             -scheme TokenBar \
             -configuration Release \
             -archivePath ./build/TokenBar.xcarchive \
             -destination 'platform=macOS' \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+            DEVELOPMENT_TEAM="$APPLE_TEAM_ID" \
+            CODE_SIGN_STYLE=Manual \
+            CODE_SIGN_IDENTITY="Developer ID Application"
 
       - name: Export App
+        env:
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          # Create export options plist for distribution without signing
+          # Create export options plist for Developer ID distribution
           cat > ./build/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
           <dict>
               <key>method</key>
-              <string>mac-application</string>
+              <string>developer-id</string>
+              <key>teamID</key>
+              <string>$APPLE_TEAM_ID</string>
               <key>signingStyle</key>
               <string>manual</string>
+              <key>signingCertificate</key>
+              <string>Developer ID Application</string>
           </dict>
           </plist>
           EOF
@@ -56,6 +87,25 @@ jobs:
             -archivePath ./build/TokenBar.xcarchive \
             -exportPath ./build/export \
             -exportOptionsPlist ./build/ExportOptions.plist
+
+      - name: Notarize App
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          # Create a ZIP for notarization (Apple requires ZIP or DMG)
+          ditto -c -k --keepParent ./build/export/TokenBar.app ./build/TokenBar-notarize.zip
+
+          # Submit for notarization
+          xcrun notarytool submit ./build/TokenBar-notarize.zip \
+            --apple-id "$APPLE_ID" \
+            --password "$APPLE_APP_SPECIFIC_PASSWORD" \
+            --team-id "$APPLE_TEAM_ID" \
+            --wait
+
+          # Staple the notarization ticket to the app
+          xcrun stapler staple ./build/export/TokenBar.app
 
       - name: Create DMG
         run: |
@@ -68,6 +118,16 @@ jobs:
             -srcfolder ./build/dmg \
             -ov -format UDZO \
             ./build/TokenBar.dmg
+
+          # Notarize the DMG as well
+          xcrun notarytool submit ./build/TokenBar.dmg \
+            --apple-id "${{ secrets.APPLE_ID }}" \
+            --password "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}" \
+            --team-id "${{ secrets.APPLE_TEAM_ID }}" \
+            --wait
+
+          # Staple the notarization to the DMG
+          xcrun stapler staple ./build/TokenBar.dmg
 
       - name: Create ZIP archive
         run: |
@@ -98,3 +158,10 @@ jobs:
             ./build/TokenBar.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Clean up keychain and certificate
+        if: always()
+        run: |
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          security delete-keychain $KEYCHAIN_PATH || true
+          rm -f $RUNNER_TEMP/build_certificate.p12 || true
